@@ -10,6 +10,7 @@ class Character:
     subtitle_source: str
     system_prompt: str
     original_y: int
+    subtitle_y_offset: int = 0
     model: str = "gpt-4o-mini"  # default model unless overridden
 
 SKELETON = Character(
@@ -23,7 +24,8 @@ SKELETON = Character(
         "no emojis. no '*'. be chaotic, unpredictable, strange."
         "be strange, confusing, UNHINGED AND CRUDE. say UNIQUE things and make sure to not say the same thing twice."
     ),
-    original_y=600
+    original_y=1050,
+    subtitle_y_offset=-150
 )
 
 SCIENTIST = Character(
@@ -33,7 +35,7 @@ SCIENTIST = Character(
     subtitle_source=DEFAULT_SUBTITLE_SOURCE,
     system_prompt=(
         "you are the scientist. calm, observant, nerdy, thoughtful."
-        "you love to give little factoids."
+        "you love to give little factoids about EVERYTHING."
     ),
-    original_y=654
+    original_y=900
 )

@@ -22,13 +22,13 @@ def run_obs_listener():
 
 def calculate_offset(dbL, dbR):
     db = (dbL + dbR) / 2
-    if db <= -190:
+    if db <= -175:
         return 0
 
     tts_state.hold_time = HOLD_TIME # db > 0
 
     db = max(min(db, 0), -100)
-    return np.interp(db, [-100, 0], [-5, MOVEMENT_STRENGTH])
+    return np.interp(db, [-75, 0], [0, MOVEMENT_STRENGTH])
 
 def move_source(char: Character, offset_y):
     try:
@@ -45,10 +45,7 @@ def move_source(char: Character, offset_y):
         new_y = char.original_y - offset_y
         tts_state.hold_time -= 1
 
-        pos_x = req.get_scene_item_transform(
-            SCENE,
-            item_id
-        ).scene_item_transform["positionX"]
+        pos_x = req.get_scene_item_transform(SCENE,item_id).scene_item_transform["positionX"]
 
         req.set_scene_item_transform(
             SCENE,
@@ -62,7 +59,7 @@ def move_source(char: Character, offset_y):
             SCENE,
             subtitle_item_id,
             {
-                "positionY": new_y + 150,
+                "positionY": new_y + char.subtitle_y_offset,
                 "rotation": offset_y * 0.05,
                 "positionX": pos_x
             }

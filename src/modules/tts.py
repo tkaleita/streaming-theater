@@ -4,6 +4,7 @@ import time
 import sounddevice as sd
 import soundfile as sf
 from queue import Queue
+import ctypes
 
 from core.state import tts_state
 from core.config import *
@@ -12,9 +13,12 @@ from core.config import *
 # background threads
 audio_queue = Queue()
 def audio_worker():
+    ctypes.windll.ole32.CoInitialize(None)
+
     # wait until audio is supposed to play, then play it
     while True:
         path = audio_queue.get()
+        print(path)
         try:
             play_file_to_virtual_cable(path)
         except Exception as e:
@@ -79,6 +83,7 @@ def play_file_to_virtual_cable(path):
     data, samplerate = sf.read(path, dtype="float32")
 
     device_index = get_virtual_cable_device()
+    sd.default.device = device_index
     print(f"playing through VB-Cable (device {device_index})")
 
     sd.play(data, samplerate)
@@ -101,5 +106,5 @@ async def fire_tts(char: Character, text):
     )
 
     print(f"🔊 SPOKEN + DISPLAYED: {text}")
-    # to prevent blockage of ALL threads
     audio_queue.put(audio_file)
+    #play_file_to_virtual_cable(audio_file)
