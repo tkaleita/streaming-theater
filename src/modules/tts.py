@@ -8,9 +8,11 @@ from queue import Queue
 from core.state import tts_state
 from core.config import *
 
+
 # background threads
 audio_queue = Queue()
 def audio_worker():
+    # wait until audio is supposed to play, then play it
     while True:
         path = audio_queue.get()
         try:
@@ -74,12 +76,9 @@ def get_virtual_cable_device():
     raise RuntimeError("VB-Cable WASAPI device not found")
 
 def play_file_to_virtual_cable(path):
-    data, samplerate = sf.read(path, dtype='float32')
+    data, samplerate = sf.read(path, dtype="float32")
 
-    # Explicitly select the correct VB-Cable device
     device_index = get_virtual_cable_device()
-    sd.default.device = device_index
-
     print(f"playing through VB-Cable (device {device_index})")
 
     sd.play(data, samplerate)
