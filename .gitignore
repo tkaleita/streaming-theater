@@ -16,3 +16,5 @@ build/
 
 # App-specific
 tts_output/
+*.wav
+*.jpg
