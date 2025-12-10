@@ -8,7 +8,6 @@ from core.state import chat_state, tts_state
 import modules.tts as tts
 from chat import twitch, router
 
-#region DEFINE COMMANDS
 @dataclass
 class Command:
     name: str
@@ -29,7 +28,6 @@ def command(name: str, args: list[str], cooldown: int = 0):
         COMMANDS[name] = spec
         return func
     return decorator
-#endregion
 
 def build_usage(spec: Command) -> str:
     parts = []
@@ -124,7 +122,7 @@ async def react(user, character, text):
     if char is None:
         available = ", ".join(CHARACTERS.keys())
         twitch.helix_send_message(
-            f"unknown character '{character}'. available: {available}"
+            f"@{user} -> unknown character '{character}'. available: {available}"
         )
         return
     screenshot = ai.capture_webcam_image()
