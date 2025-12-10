@@ -59,7 +59,7 @@ def move_source(char: Character, offset_y):
             SCENE,
             subtitle_item_id,
             {
-                "positionY": new_y + char.subtitle_y_offset,
+                "positionY": new_y - char.subtitle_y_offset,
                 "rotation": offset_y * 0.05,
                 "positionX": pos_x
             }

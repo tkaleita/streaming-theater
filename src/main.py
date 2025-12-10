@@ -14,7 +14,8 @@ async def run_all_listeners():
     tasks = [
         twitch.twitch_listener(),
         #youtube_listener()
-        tts.tts_queue_processor()
+        tts.tts_queue_processor(),
+        voice_recog.run_vr_loop()
     ]
     
     if ENABLE_IDLE_CHATTER:
@@ -27,9 +28,6 @@ def main():
 
     obs_thread = threading.Thread(target=obs_move.run_obs_listener, daemon=True)
     obs_thread.start()
-
-    vr_thread = threading.Thread(target=voice_recog.run_vr_loop, daemon=True)
-    vr_thread.start()
 
     threading.Thread(target=audio_worker, daemon=True).start()
 

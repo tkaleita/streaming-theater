@@ -18,10 +18,11 @@ async def get_ai_reply(char: Character, msg, image_base64):
                     {"type": "text",
                     "text": f"{char.system_prompt}"
                             "MAXIMUM STRICT REPLY LIMIT: NEVER EXCEED 10 WORDS. KEEP YOUR ANSWERS SHORT. ALWAYS!"
+                            "never use emojis."
                             "react to the screenshot as if you see it live."
                             "be unpredictable."
                             f"you only know what {char.name} would know."
-                            "ALWAYS be in character."
+                            "ALWAYS be in character and write things like you would say them naturally."
                             "you are on a livestream and viewers might say things to you."
                             "you HAVE to say something related to it. do not ignore any viewer-added messages."
                             "treat it like a viewer speaking TO or AT you."

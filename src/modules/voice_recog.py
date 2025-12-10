@@ -1,3 +1,4 @@
+import asyncio
 import time
 import keyboard
 import numpy as np
@@ -8,28 +9,39 @@ import soundfile as sf
 from chat import router
 import modules.ai as ai
 from core.config import *
-from core.state import record_state
+from core.state import record_state, tts_state
 import modules.tts as tts
 
-def run_vr_loop():
+import asyncio
+import keyboard
+
+async def run_vr_loop():
+    loop = asyncio.get_running_loop()
+
     while True:
-        keyboard.wait("f7")
-        time.sleep(0.1)  # debounce so one press doesn't double-trigger
+        # Wait for keyboard press in a thread pool
+        await loop.run_in_executor(None, keyboard.wait, "f7")
+        await asyncio.sleep(0.1)  # debounce
 
         if not record_state.recording:
-            # START recording
-            start_recording()
+            # start recording (blocking)
+            await loop.run_in_executor(None, start_recording)
         else:
-            # STOP recording
-            text = stop_recording_and_transcribe()
+            # stop + transcribe (blocking)
+            text = await loop.run_in_executor(None, stop_recording_and_transcribe)
             if not text:
                 continue
 
             screenshot = ai.capture_webcam_image()
             router.add_to_history("tobi_focuss", text)
 
-            ai_reply = ai.get_ai_reply(REACT_CHARACTER, f"tobi_focuss: {text}", screenshot)
-            tts.enqueue_tts(REACT_CHARACTER, ai_reply)
+            ai_reply = await ai.get_ai_reply(
+                tts_state.current_char,
+                f"tobi_focuss: {text}",
+                screenshot
+            )
+
+            tts.enqueue_tts(tts_state.current_char, ai_reply)
 
 def start_recording():
     if record_state.recording:

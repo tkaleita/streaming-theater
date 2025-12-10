@@ -12,16 +12,19 @@ async def handle_message(user, msg):
         return
 
     # commands
-    if msg.lower().startswith("!say "):
-        await commands.say_command(user, msg, SAY_CHARACTER)
-        return
-    if msg.lower().startswith("!react"):
-        await commands.react_command(user, msg, REACT_CHARACTER)
+    if not msg.startswith("!"):
+        add_to_history(user, msg)
         return
 
-    # only add non-commands
-    add_to_history(user, msg)
+    parts = msg[1:].split(" ", 1)
+    name = parts[0].lower()
+    args = parts[1] if len(parts) > 1 else ""
 
+    if name in commands.COMMANDS:
+        spec = commands.COMMANDS[name]
+        await commands.call_command(spec, user, args)
+
+    return
     # combo system
     if not ENABLE_COMBO:
         return
