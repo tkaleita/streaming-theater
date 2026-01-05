@@ -8,22 +8,25 @@ from core.state import chat_state, tts_state
 import modules.tts as tts
 from chat import twitch, router
 
+#region HELPERS
 @dataclass
 class Command:
     name: str
     args: list[str]
     cooldown: int
     func: Callable
+    enabled: bool = True
 
 COMMANDS: dict[str, Command] = {}
 
-def command(name: str, args: list[str], cooldown: int = 0):
+def command(name: str, args: list[str], cooldown: int = 0, enabled: bool = True):
     def decorator(func):
         spec = Command(
             name=name,
             args=args,
             cooldown=cooldown,
-            func=func
+            func=func,
+            enabled=enabled
         )
         COMMANDS[name] = spec
         return func
@@ -40,6 +43,9 @@ def build_usage(spec: Command) -> str:
     return f"Usage: !{spec.name} " + " ".join(parts)
 
 async def call_command(cmd: Command, user: str, raw_args: str):
+    if not cmd.enabled:
+        return
+
     # --- cooldown ---
     if not DEBUG_COOLDOWN:
         now = time.time()
@@ -95,26 +101,30 @@ async def call_command(cmd: Command, user: str, raw_args: str):
                 twitch.helix_send_message(build_usage(cmd))
                 return
 
-    queue_size = tts_state.queue.qsize()
-    pos_msg = "" if queue_size == 0 else f" (queue pos {queue_size + 1})"
+    queue_size = tts_state.queue.qsize() + 1 + tts_state.busy
+    pos_msg = "" if queue_size == 1 else f" (queue pos {queue_size})"
     twitch.helix_send_message(f"@{user} -> invokes {cmd.name}!{pos_msg}")
     return await cmd.func(user=user, **parsed)
+#endregion
 
+#region COMMANDS
 @command(
     name="say",
     args=["text"],
-    cooldown=30
+    cooldown=90,
+    enabled=ENABLE_SAY
 )
 async def say(user, text):
     char = SAY_CHARACTER
     router.add_to_history(char.name, text)
     print(f"!say from {user}: {text}")
-    tts.enqueue_tts(char, text)
+    tts.say_as(char, text)
 
 @command(
     name="react",
     args=["character", "text?"],
-    cooldown=30
+    cooldown=45,
+    enabled=ENABLE_REACT
 )
 async def react(user, character, text):
     key = character.lower()
@@ -125,6 +135,15 @@ async def react(user, character, text):
             f"@{user} -> unknown character '{character}'. available: {available}"
         )
         return
-    screenshot = ai.capture_webcam_image()
-    ai_reply = await ai.get_ai_reply(char, f"{user}: {text}", screenshot)
-    tts.enqueue_tts(char, ai_reply)
+    ai_reply = await ai.get_ai_reply(char, f"{user}: {text}")
+    tts.say_as(char, ai_reply)
+
+@command(
+    name="jumpscare",
+    args=[],
+    cooldown=120,
+    enabled=ENABLE_JUMPSCARE
+)
+async def jumpscare(user):
+    return
+#endregion

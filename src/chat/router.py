@@ -4,6 +4,7 @@ from cv2 import normalize
 from chat import commands
 from core.config import *
 from core.state import chat_state
+from modules import director
 import modules.tts as tts
 
 async def handle_message(user, msg):
@@ -11,11 +12,14 @@ async def handle_message(user, msg):
     if user == "tobi_focuss_bot":
         return
 
-    # commands
+    # normal message
     if not msg.startswith("!"):
         add_to_history(user, msg)
+        if ENABLE_DIRECTOR:
+            director.handle_message(msg)
         return
 
+    # commands
     parts = msg[1:].split(" ", 1)
     name = parts[0].lower()
     args = parts[1] if len(parts) > 1 else ""
@@ -24,8 +28,7 @@ async def handle_message(user, msg):
         spec = commands.COMMANDS[name]
         await commands.call_command(spec, user, args)
 
-    return
-    # combo system
+    # combo system (bugged rn i guess?)
     if not ENABLE_COMBO:
         return
 
@@ -45,7 +48,7 @@ async def handle_message(user, msg):
 
     if unique_count >= COMBO_TRIGGER_COUNT:
         chat_state.spam_map[msg_norm].clear()
-        await tts.enqueue_tts(SAY_CHARACTER, msg)
+        await tts.say_as(SAY_CHARACTER, msg)
 
 def add_to_history(user, msg):
     chat_state.history.append(f"{user}: {msg}")

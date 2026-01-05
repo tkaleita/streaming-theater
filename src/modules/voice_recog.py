@@ -32,16 +32,10 @@ async def run_vr_loop():
             if not text:
                 continue
 
-            screenshot = ai.capture_webcam_image()
             router.add_to_history("tobi_focuss", text)
 
-            ai_reply = await ai.get_ai_reply(
-                tts_state.current_char,
-                f"tobi_focuss: {text}",
-                screenshot
-            )
-
-            tts.enqueue_tts(tts_state.current_char, ai_reply)
+            ai_reply = await ai.get_ai_reply(tts_state.current_char, f"tobi_focuss: {text}")
+            tts.say_as(tts_state.current_char, ai_reply)
 
 def start_recording():
     if record_state.recording:

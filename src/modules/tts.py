@@ -89,7 +89,7 @@ def play_file_to_virtual_cable(path):
     sd.play(data, samplerate)
     sd.wait()
 
-def enqueue_tts(char: Character, text):
+def say_as(char: Character, text):
     tts_state.queue.put_nowait((char, text))
 
 async def fire_tts(char: Character, text):

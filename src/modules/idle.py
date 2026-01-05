@@ -15,16 +15,14 @@ async def idle_chatter():
 
         try:
             print("Idle chatter triggered.")
-
-            screenshot = ai.capture_webcam_image()
             
             # Use a special message indicating "no viewer spoke"
             #msg = random.choice(IDLE_MESSAGES)
 
             background = voice_recog.record_fixed_audio(IDLE_RECORD_TIME)
             char = random.choice(list(CHARACTERS.values()))
-            ai_reply = await ai.get_ai_reply(char, f"tobi: {background}", screenshot)
-            tts.enqueue_tts(char, ai_reply)
+            ai_reply = await ai.get_ai_reply(char, f"tobi: {background}")
+            tts.say_as(char, ai_reply)
 
         except Exception as e:
             print("Idle chatter failed:", e)

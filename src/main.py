@@ -4,6 +4,7 @@ import threading
 # own files
 from chat import twitch, youtube
 from core.config import * # so every variable is just plain accessible
+from modules import director
 import modules.idle as idle
 import modules.tts as tts
 import modules.obs_move as obs_move
@@ -20,6 +21,9 @@ async def run_all_listeners():
     
     if ENABLE_IDLE_CHATTER:
         tasks.append(idle.idle_chatter())
+
+    if ENABLE_DIRECTOR:
+        tasks.append(director.run_director_loop())
 
     await asyncio.gather(*tasks)
 

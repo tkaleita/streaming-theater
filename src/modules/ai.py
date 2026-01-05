@@ -6,8 +6,15 @@ from chat import router
 from core.state import chat_state
 from core.config import openai_client, CHAT_HISTORY_LIMIT, Character
 
-async def get_ai_reply(char: Character, msg, image_base64):
+async def get_ai_reply(char: Character, msg, take_screenshot = True, chat_history = []):
     chat_history_str = "".join(f"[{line}]" for line in chat_state.history)
+    if (len(chat_history) <= 0):
+        chat_history_str = "".join(f"[{line}]" for line in chat_history)
+
+    image_base64 = []
+    if (take_screenshot):
+        image_base64 = capture_webcam_image()
+
     loop = asyncio.get_event_loop()
     response = await loop.run_in_executor(None, lambda: openai_client.chat.completions.create(
         model=char.model,
@@ -23,10 +30,10 @@ async def get_ai_reply(char: Character, msg, image_base64):
                             "be unpredictable."
                             f"you only know what {char.name} would know."
                             "ALWAYS be in character and write things like you would say them naturally."
-                            "you are on a livestream and viewers might say things to you."
+                            "you are on a livestream and viewers MIGHT say things to you."
                             "you HAVE to say something related to it. do not ignore any viewer-added messages."
                             "treat it like a viewer speaking TO or AT you."
-                            "viewer names are vieable in chat history."
+                            "viewer names are viewable in chat history."
                             "the streamers name is tobi aka tobi_focuss."
                     }
                 ],

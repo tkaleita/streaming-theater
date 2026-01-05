@@ -39,12 +39,23 @@ DEVICE = "TTS Output"
 HOLD_TIME = 20 # max amount of ticks to keep image and text visible after db reaches 0
 MOVEMENT_STRENGTH = 50
 
-ENABLE_COMBO = False
+# chat combo
+ENABLE_COMBO = False # currently bugged
 COMBO_TRIGGER_COUNT = 2
 COMBO_WINDOW_SECONDS = 10
 
+# director
+ENABLE_DIRECTOR = True
+DIRECTOR_COOLDOWN = 10
+DIRECTOR_CHAT_TIME = 10
+
 # commands
-DEBUG_COOLDOWN = True
+DEBUG_COOLDOWN = False
+ENABLE_SAY = False
+ENABLE_REACT = False
+
+ENABLE_JUMPSCARE = True # not implemented
+
 SAY_CHARACTER = CHAT
 DEFAULT_REACT_CHARACTER = SKELETON
 
@@ -60,7 +71,7 @@ CHAT_HISTORY_LIMIT = 20
 # idle chatter
 ENABLE_IDLE_CHATTER = True
 #IDLE_CHARACTER = 
-#IDLE_RESET_BY_REACT = 
+#IDLE_RESET_ON_REACT = False
 MIN_IDLE_TIME = 300
 MAX_IDLE_TIME = 600
 IDLE_RECORD_TIME = 15
