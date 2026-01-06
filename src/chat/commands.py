@@ -6,6 +6,7 @@ import modules.ai as ai
 from core.config import *
 from core.state import chat_state, tts_state
 import modules.tts as tts
+import modules.jumpscare as js
 from chat import twitch, router
 
 #region HELPERS
@@ -13,7 +14,7 @@ from chat import twitch, router
 class Command:
     name: str
     args: list[str]
-    cooldown: int
+    cooldown: int # currently always PER-USER
     func: Callable
     enabled: bool = True
 
@@ -65,6 +66,7 @@ async def call_command(cmd: Command, user: str, raw_args: str):
 
     # no arguments declared → ignore user args and just call
     if not arg_specs:
+        twitch.helix_send_message(f"@{user} -> invokes {cmd.name}!")
         return await cmd.func(user=user)
 
     REST_NAMES = {"rest", "text", "message"}
@@ -141,9 +143,10 @@ async def react(user, character, text):
 @command(
     name="jumpscare",
     args=[],
-    cooldown=120,
+    cooldown=300,
     enabled=ENABLE_JUMPSCARE
 )
 async def jumpscare(user):
+    js.play_jumpscare()
     return
 #endregion

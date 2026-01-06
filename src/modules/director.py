@@ -29,7 +29,7 @@ async def run_director_loop():
         delay = DIRECTOR_CHAT_TIME
 
         ai_reply = await ai.get_ai_reply(characters.DIRECTOR,
-                                         f"tell the viewers to drop suggestions in the chat and that they have {delay} seconds!")
+                                         f"tell the viewers to send suggestions in the chat and that they have {delay} seconds!")
         tts.say_as(characters.DIRECTOR, ai_reply)
         print("Director window open!")
 
