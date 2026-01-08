@@ -13,17 +13,22 @@ def play_jumpscare():
     # get jumpscare media source
     item_id = req.get_scene_item_id(SCENE, "Jumpscare").scene_item_id
 
-    # choose random video
-    files = [
+    # get all valid files first
+    all_files = [
         os.path.join(video_folder, f) 
         for f in os.listdir(video_folder) 
-        if f.lower().endswith(valid_extensions) and f.lower() is not current_video.lower
+        if f.lower().endswith(valid_extensions)
     ]
-    if not files:
-        print("No video files found in the directory!")
-        exit()
-        
-    random_video = random.choice(files)
+
+    if not all_files:
+        print("Folder is empty!")
+        return
+
+    # filter out the last played video
+    choices = [f for f in all_files if f.lower() != current_video.lower()]
+
+    # select video
+    random_video = random.choice(choices if choices else all_files)
     current_video = random_video
     print(f"Selected video: {random_video}")
 
@@ -33,6 +38,10 @@ def play_jumpscare():
     
     # adjust width and height
     video_settings = req.get_video_settings()
+    if video_settings is None:
+        play_jumpscare() # restart function, try again
+        return
+    
     canvas_w = video_settings.base_width
     canvas_h = video_settings.base_height
     req.set_scene_item_transform(SCENE, item_id, {

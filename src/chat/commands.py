@@ -113,8 +113,8 @@ async def call_command(cmd: Command, user: str, raw_args: str):
 @command(
     name="say",
     args=["text"],
-    cooldown=90,
-    enabled=ENABLE_SAY
+    cooldown=SAY_COOLDOWN,
+    enabled=SAY_ENABLE
 )
 async def say(user, text):
     char = SAY_CHARACTER
@@ -125,8 +125,8 @@ async def say(user, text):
 @command(
     name="react",
     args=["character", "text?"],
-    cooldown=45,
-    enabled=ENABLE_REACT
+    cooldown=REACT_COOLDOWN,
+    enabled=REACT_ENABLE
 )
 async def react(user, character, text):
     key = character.lower()
@@ -143,8 +143,8 @@ async def react(user, character, text):
 @command(
     name="jumpscare",
     args=[],
-    cooldown=300,
-    enabled=ENABLE_JUMPSCARE
+    cooldown=JUMPSCARE_COOLDOWN,
+    enabled=JUMPSCARE_ENABLE
 )
 async def jumpscare(user):
     js.play_jumpscare()
