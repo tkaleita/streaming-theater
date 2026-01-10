@@ -15,7 +15,7 @@ async def handle_message(user, msg):
     # normal message
     if not msg.startswith("!"):
         add_to_history(user, msg)
-        if ENABLE_DIRECTOR:
+        if DIRECTOR_ENABLE:
             director.handle_message(msg)
         return
 
@@ -29,7 +29,7 @@ async def handle_message(user, msg):
         await commands.call_command(spec, user, args)
 
     # combo system (bugged rn i guess?)
-    if not ENABLE_COMBO:
+    if not COMBO_ENABLE:
         return
 
     msg_norm = normalize(msg)

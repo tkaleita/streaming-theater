@@ -20,6 +20,8 @@ async def run_vr_loop():
 
     while True:
         # Wait for keyboard press in a thread pool
+        # this fuckin sucks
+        # replace with: 'keyboard.add_hotkey("ctrl+f8", on_ctrl_f8_pressed)' (for ex.)
         await loop.run_in_executor(None, keyboard.wait, "f7")
         await asyncio.sleep(0.1)  # debounce
 

@@ -88,6 +88,7 @@ CATERPILLAR = Character(
     original_y=900
 )
 
+# these are accesible to chat using !react command
 CHARACTERS = {
     "scientist": SCIENTIST,
     "skeleton": SKELETON,
@@ -96,7 +97,7 @@ CHARACTERS = {
     "caterpillar": CATERPILLAR
 }
 
-# this guy is special, only meant for the director module
+# this guy is special, only meant for the director module (hence why hes not in the characters list)
 DIRECTOR = Character(
     name="The Director",
     voice_id="CeNX9CMwmxDxUF5Q2Inm",

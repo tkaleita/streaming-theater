@@ -1,5 +1,6 @@
 from enum import IntEnum
 import os
+from pathlib import Path
 from elevenlabs import ElevenLabs
 from openai import OpenAI
 import obsws_python as obs
@@ -33,6 +34,9 @@ ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
 req = obs.ReqClient(host="localhost", port=4455)
 
+# data file path
+DATA_FILE = Path(__file__).resolve().parent.parent / "data.json"
+
 # obs general audio movement
 LEVELTYPE = IntEnum("LEVELTYPE", "VU POSTFADER PREFADER", start=0)
 DEVICE = "TTS Output"
@@ -40,19 +44,22 @@ HOLD_TIME = 20 # max amount of ticks to keep image and text visible after db rea
 MOVEMENT_STRENGTH = 50
 
 # chat combo
-ENABLE_COMBO = False # currently bugged
+COMBO_ENABLE = False # currently bugged
 COMBO_TRIGGER_COUNT = 2
 COMBO_WINDOW_SECONDS = 10
 
 # director
-ENABLE_DIRECTOR = False
-DIRECTOR_COOLDOWN = 450
+DIRECTOR_ENABLE = False
+DIRECTOR_COOLDOWN = 10
 DIRECTOR_CHAT_TIME = 30
+
+# progress
+PROGRESS_ENABLE = True
 
 # commands
 DEBUG_COOLDOWN = True
 
-SAY_ENABLE = False
+SAY_ENABLE = True
 SAY_COOLDOWN = 90
 SAY_CHARACTER = CHAT
 
@@ -61,7 +68,7 @@ REACT_COOLDOWN = 60
 DEFAULT_REACT_CHARACTER = SKELETON
 
 JUMPSCARE_ENABLE = True
-JUMPSCARE_COOLDOWN = 300
+JUMPSCARE_COOLDOWN = 90
 
 # elevenlabs
 eleven_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
@@ -73,7 +80,7 @@ SCENE = "Overlay"
 CHAT_HISTORY_LIMIT = 20
 
 # idle chatter
-ENABLE_IDLE_CHATTER = False
+IDLE_CHATTER_ENABLE = False
 #IDLE_CHARACTER = 
 #IDLE_RESET_ON_REACT = False
 MIN_IDLE_TIME = 300

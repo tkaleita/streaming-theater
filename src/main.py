@@ -8,6 +8,7 @@ from modules import director
 import modules.idle as idle
 import modules.tts as tts
 import modules.obs_move as obs_move
+import modules.progress as progress
 from modules.tts import audio_worker
 import modules.voice_recog as voice_recog
 
@@ -15,15 +16,22 @@ async def run_all_listeners():
     tasks = [
         twitch.twitch_listener(),
         #youtube_listener()
-        tts.tts_queue_processor(),
-        voice_recog.run_vr_loop()
     ]
     
-    if ENABLE_IDLE_CHATTER:
+    if SAY_ENABLE or REACT_ENABLE:
+        tasks.append(tts.tts_queue_processor())
+
+    if REACT_ENABLE:
+        tasks.append(voice_recog.run_vr_loop())
+    
+    if IDLE_CHATTER_ENABLE:
         tasks.append(idle.idle_chatter())
 
-    if ENABLE_DIRECTOR:
+    if DIRECTOR_ENABLE:
         tasks.append(director.run_director_loop())
+
+    if PROGRESS_ENABLE:
+        tasks.append(progress.run_progress_loop())
 
     await asyncio.gather(*tasks)
 

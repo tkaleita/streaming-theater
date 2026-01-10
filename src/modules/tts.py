@@ -8,7 +8,7 @@ import ctypes
 
 from core.state import tts_state
 from core.config import *
-
+from core.sound_player import *
 
 # background threads
 audio_queue = Queue()
@@ -20,6 +20,7 @@ def audio_worker():
         path = audio_queue.get()
         print(path)
         try:
+            play_sound(Sounds.MESSAGE, 0.25)
             play_file_to_virtual_cable(path)
         except Exception as e:
             print("Audio error:", e)
@@ -104,7 +105,4 @@ async def fire_tts(char: Character, text):
         settings={"text": text},
         overlay=True
     )
-
-    print(f"🔊 SPOKEN + DISPLAYED: {text}")
     audio_queue.put(audio_file)
-    #play_file_to_virtual_cable(audio_file)
