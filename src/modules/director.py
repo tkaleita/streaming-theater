@@ -14,6 +14,7 @@ def handle_message(msg):
 
     if not active:
         return
+    
     chat_history.append(msg)
     print("appended message to director chat history!")
 

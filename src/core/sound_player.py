@@ -11,6 +11,7 @@ class Sounds(Enum):
     XP_ERROR = f"{BASE_DIR}Windows XP Error Sound.mp3"
     WIN = f"{BASE_DIR}WIN sound effect no copyright.mp3"
     MESSAGE = f"{BASE_DIR}Half-Life 2/message.wav"
+    DING = f"{BASE_DIR}Ding Sound Effect HD.mp3"
 
 def play_sound(sound_enum: Sounds, volume: float = 0.5, pitch_variance=True):
     file_path = sound_enum.value
@@ -19,7 +20,7 @@ def play_sound(sound_enum: Sounds, volume: float = 0.5, pitch_variance=True):
         sound = pygame.mixer.Sound(str(file_path))
         if pitch_variance:
             sound_array = pygame.sndarray.array(sound)
-            factor = random.uniform(0.9, 1.1)
+            factor = random.uniform(0.95, 1.05)
             
             # resample the array
             # we create new indices to "stretch" or "compress" the sound

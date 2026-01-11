@@ -5,6 +5,7 @@ from chat import commands
 from core.config import *
 from core.state import chat_state
 from modules import director
+from modules import gamer_cred
 import modules.tts as tts
 
 async def handle_message(user, msg):
@@ -17,6 +18,8 @@ async def handle_message(user, msg):
         add_to_history(user, msg)
         if DIRECTOR_ENABLE:
             director.handle_message(msg)
+        if GAMER_CRED_ENABLE:
+             gamer_cred.handle_message(msg)
         return
 
     # commands
