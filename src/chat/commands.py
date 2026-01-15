@@ -7,7 +7,7 @@ from core.config import *
 from core.state import chat_state, tts_state
 import modules.tts as tts
 import modules.jumpscare as js
-from chat import twitch, router
+from chat import shared, twitch, router
 
 #region HELPERS
 @dataclass
@@ -43,7 +43,7 @@ def build_usage(spec: Command) -> str:
             parts.append(f"<{arg}>")
     return f"Usage: !{spec.name} " + " ".join(parts)
 
-async def call_command(cmd: Command, user: str, raw_args: str):
+async def call_command(origin: str, cmd: Command, user: str, raw_args: str):
     if not cmd.enabled:
         return
 
@@ -54,7 +54,7 @@ async def call_command(cmd: Command, user: str, raw_args: str):
 
         if now - last < cmd.cooldown:
             remaining = round(cmd.cooldown - (now - last))
-            twitch.helix_send_message(f"@{user} -> {cmd.name} cooldown {remaining}s!")
+            await shared.send_message(origin, f"@{user} -> {cmd.name} cooldown {remaining}s!")
             return
 
         chat_state.last_used[user][cmd.name] = now
@@ -66,8 +66,8 @@ async def call_command(cmd: Command, user: str, raw_args: str):
 
     # no arguments declared → ignore user args and just call
     if not arg_specs:
-        twitch.helix_send_message(f"@{user} -> invokes {cmd.name}!")
-        return await cmd.func(user=user)
+        await shared.send_message(origin, f"@{user} -> invokes {cmd.name}!")
+        return await cmd.func(origin=origin, user=user)
 
     REST_NAMES = {"rest", "text", "message"}
 
@@ -85,7 +85,7 @@ async def call_command(cmd: Command, user: str, raw_args: str):
                     break
                 else:
                     # missing required rest-like argument
-                    twitch.helix_send_message(build_usage(cmd))
+                    await shared.send_message(origin, build_usage(cmd))
                     return
             parsed[name] = " ".join(parts[i:])
             break
@@ -100,13 +100,13 @@ async def call_command(cmd: Command, user: str, raw_args: str):
                 continue
             else:
                 # missing required arg
-                twitch.helix_send_message(build_usage(cmd))
+                await shared.send_message(origin, build_usage(cmd))
                 return
 
     queue_size = tts_state.queue.qsize() + 1 + tts_state.busy
     pos_msg = "" if queue_size == 1 else f" (queue pos {queue_size})"
-    twitch.helix_send_message(f"@{user} -> invokes {cmd.name}!{pos_msg}")
-    return await cmd.func(user=user, **parsed)
+    await shared.send_message(origin, f"@{user} -> invokes {cmd.name}!{pos_msg}")
+    return await cmd.func(origin=origin, user=user, **parsed)
 #endregion
 
 #region COMMANDS
@@ -116,7 +116,7 @@ async def call_command(cmd: Command, user: str, raw_args: str):
     cooldown=SAY_COOLDOWN,
     enabled=SAY_ENABLE
 )
-async def say(user, text):
+async def say(origin, user, text):
     char = SAY_CHARACTER
     router.add_to_history(char.name, text)
     print(f"!say from {user}: {text}")
@@ -128,14 +128,12 @@ async def say(user, text):
     cooldown=REACT_COOLDOWN,
     enabled=REACT_ENABLE
 )
-async def react(user, character, text):
+async def react(origin, user, character, text):
     key = character.lower()
     char = CHARACTERS.get(key)
     if char is None:
         available = ", ".join(CHARACTERS.keys())
-        twitch.helix_send_message(
-            f"@{user} -> unknown character '{character}'. available: {available}"
-        )
+        await shared.send_message(origin, f"@{user} -> unknown character '{character}'. available: {available}")
         return
     ai_reply = await ai.get_ai_reply(char, f"{user}: {text}")
     tts.say_as(char, ai_reply)
@@ -146,7 +144,7 @@ async def react(user, character, text):
     cooldown=JUMPSCARE_COOLDOWN,
     enabled=JUMPSCARE_ENABLE
 )
-async def jumpscare(user):
+async def jumpscare(origin, user):
     js.play_jumpscare()
     return
 #endregion

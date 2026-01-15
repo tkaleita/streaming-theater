@@ -20,7 +20,7 @@ def plus_progress():
     print("plus_progress")
     update_progress()
 
-    sound_player.play_sound(Sounds.MESSAGE, 0.4)
+    sound_player.play_sound(Sounds.MESSAGE, 0.4, 1, 1.1)
 
     if current_progress >= max_progress:
         sound_player.play_sound(Sounds.WIN, 0.5)
@@ -33,7 +33,7 @@ def minus_progress():
     print("minus_progress")
     update_progress()
 
-    sound_player.play_sound(Sounds.MESSAGE, 0.4)
+    sound_player.play_sound(Sounds.MESSAGE, 0.4, 0.9, 0.95)
     return
 
 def reset_progress():

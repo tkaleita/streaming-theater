@@ -38,7 +38,7 @@ async def twitch_listener():
             
             await router.handle_message(user, msg)
         
-def helix_send_message(message):
+def send_message(message):
     url = "https://api.twitch.tv/helix/chat/messages"
     headers = {
         "Client-ID": TW_CLIENT_ID,
@@ -56,7 +56,7 @@ def helix_send_message(message):
     print(r)
     return r["data"][0]["message_id"]
 
-def helix_delete_message(message_id):
+def delete_message(message_id):
     url = (
         "https://api.twitch.tv/helix/moderation/chat"
         f"?broadcaster_id={TW_BROADCASTER_ID}"
@@ -83,6 +83,6 @@ def normalize(msg: str) -> str:
 
 def deduct_points(user, cost, command):
     remove_cmd = f"!removepoints {user} {cost}"
-    msg_id = helix_send_message(remove_cmd)
-    helix_delete_message(msg_id)
+    msg_id = send_message(remove_cmd)
+    delete_message(msg_id)
     print(f"Charged {cost} points from {user}")

@@ -8,7 +8,7 @@ from modules import director
 from modules import gamer_cred
 import modules.tts as tts
 
-async def handle_message(user, msg):
+async def handle_message(user, msg, origin = "twitch"):
     # filter specific users
     if user == "tobi_focuss_bot":
         return
@@ -29,7 +29,7 @@ async def handle_message(user, msg):
 
     if name in commands.COMMANDS:
         spec = commands.COMMANDS[name]
-        await commands.call_command(spec, user, args)
+        await commands.call_command(origin, spec, user, args)
 
     # combo system (bugged rn i guess?)
     if not COMBO_ENABLE:

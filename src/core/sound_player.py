@@ -13,22 +13,22 @@ class Sounds(Enum):
     MESSAGE = f"{BASE_DIR}Half-Life 2/message.wav"
     DING = f"{BASE_DIR}Ding Sound Effect HD.mp3"
 
-def play_sound(sound_enum: Sounds, volume: float = 0.5, pitch_variance=True):
+def play_sound(sound_enum: Sounds, volume: float = 0.5, min_pitch = 0.95, max_pitch = 1.05):
     file_path = sound_enum.value
 
     try:
         sound = pygame.mixer.Sound(str(file_path))
-        if pitch_variance:
-            sound_array = pygame.sndarray.array(sound)
-            factor = random.uniform(0.95, 1.05)
-            
-            # resample the array
-            # we create new indices to "stretch" or "compress" the sound
-            indices = np.round(np.arange(0, len(sound_array), factor))
-            indices = indices[indices < len(sound_array)].astype(int)
-            new_array = sound_array[indices]
-            
-            sound = pygame.sndarray.make_sound(new_array)
+
+        sound_array = pygame.sndarray.array(sound)
+        factor = random.uniform(min_pitch, max_pitch)
+        
+        # resample the array
+        # we create new indices to "stretch" or "compress" the sound
+        indices = np.round(np.arange(0, len(sound_array), factor))
+        indices = indices[indices < len(sound_array)].astype(int)
+        new_array = sound_array[indices]
+        
+        sound = pygame.sndarray.make_sound(new_array)
 
         sound.set_volume(volume)
         sound.play()

@@ -15,7 +15,7 @@ import modules.voice_recog as voice_recog
 async def run_all_listeners():
     tasks = [
         twitch.twitch_listener(),
-        #youtube_listener()
+        youtube.youtube_listener()
     ]
     
     if SAY_ENABLE or REACT_ENABLE:
