@@ -142,6 +142,7 @@ def get_chat_id(force_refresh = False):
         # This is the ONLY valid state for chat polling
         if status == "live" and local_chat_id:
             chat_id = local_chat_id
+            print(f"stream found with title: {item["snippet"].get("title")}")
             return chat_id
 
     return None

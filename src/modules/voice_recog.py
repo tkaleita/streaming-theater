@@ -9,6 +9,7 @@ import soundfile as sf
 from chat import router
 import modules.ai as ai
 from core.config import *
+import core.sound_player as sound_player
 from core.state import record_state, tts_state
 import modules.tts as tts
 
@@ -44,6 +45,7 @@ def start_recording():
         return
 
     print("🎤 Recording started...")
+    sound_player.play_sound(sound_player.Sounds.MESSAGE, 0.2, 1.05, 1.1)
     record_state.recording = True
     record_state.audio_buffer = []
 
@@ -65,9 +67,9 @@ def stop_recording_and_transcribe():
     if not record_state.recording:
         return ""
 
-    record_state.recording = False
-
     print("🛑 Recording stopped.")
+    sound_player.play_sound(sound_player.Sounds.MESSAGE, 0.2, 0.9, 0.95)
+    record_state.recording = False
 
     if record_state.stream:
         record_state.stream.stop()
