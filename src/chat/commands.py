@@ -8,6 +8,7 @@ from core.state import chat_state, tts_state
 import modules.tts as tts
 import modules.jumpscare as js
 from chat import shared, twitch, router
+import modules.idle as idle
 
 #region HELPERS
 @dataclass
@@ -135,7 +136,7 @@ async def react(origin, user, character, text):
         available = ", ".join(CHARACTERS.keys())
         await shared.send_message(origin, f"@{user} -> unknown character '{character}'. available: {available}")
         return
-    ai_reply = await ai.get_ai_reply(char, f"{user}: {text}")
+    ai_reply = await ai.get_ai_reply(char, f"from {user}: {text}")
     tts.say_as(char, ai_reply)
 
 @command(

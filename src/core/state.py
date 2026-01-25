@@ -3,17 +3,19 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 
 from core.characters import *
+from core.config import *
 
 @dataclass
 class TtsState:
     queue: asyncio.Queue[tuple[Character, str]] = field(default_factory=asyncio.Queue)
     busy: bool = False
-    current_char: Character = field(default_factory=lambda: SKELETON)
+    current_char: Character = field(default_factory=lambda: DEFAULT_REACT_CHARACTER)
     hold_time: float = 0.0
 
 @dataclass
 class ChatState:
-    history: list[str] = field(default_factory=list)
+    chat_history: list[str] = field(default_factory=list) # generel chat history
+    history: list[str] = field(default_factory=list) # convo history for characters
     last_used: dict = field(default_factory=lambda: defaultdict(lambda: defaultdict(float)))
     spam_map: dict = field(default_factory=lambda: defaultdict(dict))
 

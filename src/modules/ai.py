@@ -4,12 +4,22 @@ import cv2
 
 from chat import router
 from core.state import chat_state
-from core.config import openai_client, CHAT_HISTORY_LIMIT, Character
+from core.config import *
+import modules.idle as idle
 
-async def get_ai_reply(char: Character, msg, take_screenshot = True, chat_history = []):
-    chat_history_str = "".join(f"[{line}]" for line in chat_state.history)
+async def get_ai_reply(char: Character, msg, take_screenshot = True, chat_history = chat_state.chat_history):
+    if IDLE_RESET_ON_REACT:
+        idle.reset_timer()
+
+    chat_history_str = "".join(f"[{line}]" for line in chat_state.chat_history)
     if (len(chat_history) <= 0):
         chat_history_str = "".join(f"[{line}]" for line in chat_history)
+    print(f"CHAT HISTORY STR: {chat_history_str}")
+
+    convo_history_str = "".join(f"[{line}]" for line in chat_state.history)
+    if (len(chat_state.history) <= 0):
+        convo_history_str = "".join(f"[{line}]" for line in chat_state.history)
+    print(f"CONVO HISTORY STR: {convo_history_str}")
 
     image_base64 = []
     if (take_screenshot):
@@ -18,23 +28,30 @@ async def get_ai_reply(char: Character, msg, take_screenshot = True, chat_histor
     loop = asyncio.get_event_loop()
     response = await loop.run_in_executor(None, lambda: openai_client.chat.completions.create(
         model=char.model,
+        max_tokens=100,
         messages=[
             {
                 "role": "system",
                 "content": [
                     {"type": "text",
-                    "text": f"{char.system_prompt}"
-                            "MAXIMUM STRICT REPLY LIMIT: NEVER EXCEED 10 WORDS. KEEP YOUR ANSWERS SHORT. ALWAYS!"
-                            "never use emojis."
-                            "react to the screenshot as if you see it live."
-                            "be unpredictable."
-                            f"you only know what {char.name} would know."
-                            "ALWAYS be in character and write things like you would say them naturally."
-                            "you are on a livestream and viewers MIGHT say things to you."
-                            "you HAVE to say something related to it. do not ignore any viewer-added messages."
-                            "treat it like a viewer speaking TO or AT you."
-                            "viewer names are viewable in chat history."
-                            "the streamers name is tobi aka tobi_focuss."
+                    "text": 
+                            "MAX 5–35 WORDS. DO NOT END A REPLY WITH A QUESTION."
+                            f"You are {char.name} (just a title), the streamer’s improv partner. Stay in character and react dynamically."
+                            "The streamer's name is 'Tobi' aka 'tobi_focuss'."
+                            "Always “yes, and” the viewer message; add creative details or lore for your character."
+                            f"Dont include your own name at the beginning, i.e. '{char.name}: <message>'. Dont do this."
+                            "NEVER be stingy when it comes to information. Simply make something up."
+                            "Attached below is also a history of the current conversation. Treat it as extra context and do NOT ignore it."
+                            "It allows you to keep track of who said what."
+                            "Attached below everything else is the current Twitch chat. Respond to something if you like."
+                            "Your priority context goes like this: 1. Message, 2. Convo History, 3. Twitch History"
+                            "Subvert expectations and dont simply go for the obvious jokes."
+                            "Do not break the 4th wall unless really funny. Swear if appropriate."
+                            "The stream is for mature audiences."
+                            "React to the screenshot as if live. Use your imagination, be unpredictable."
+                            "- CHARACTER PROMPT START -"
+                            f"{char.system_prompt}"
+
                     }
                 ],
             },
@@ -42,10 +59,9 @@ async def get_ai_reply(char: Character, msg, take_screenshot = True, chat_histor
                 "role": "user",
                 "content": [
                     {"type": "text",
-                     "text":    f"Viewer-added message: '{msg}'"
-                                f"included are also the last {CHAT_HISTORY_LIMIT} messages of the twitch chat."
-                                "these act as extra context for you."
-                                f"chat history: {chat_history_str}" 
+                     "text":    f"Message (directed at you): '{msg}' | "
+                                f"Convo History: {convo_history_str} | "
+                                f"Twitch Chat History: {chat_history_str} | "
                     },
                     {
                         "type": "image_url",
@@ -61,7 +77,7 @@ async def get_ai_reply(char: Character, msg, take_screenshot = True, chat_histor
     ai_reply = response.choices[0].message.content
     print("Response:", ai_reply)
 
-    router.add_to_history(f"{char.name}(You)", ai_reply)
+    router.add_to_history(char.name, ai_reply)
     return ai_reply
 
 def capture_webcam_image(output_file="screenshot.jpg"):

@@ -16,35 +16,35 @@ import modules.tts as tts
 import asyncio
 import keyboard
 
-async def run_vr_loop():
+loop = None
+
+async def setup_vr():
+    global loop
     loop = asyncio.get_running_loop()
+    keyboard.add_hotkey("f7", toggle_recording_hotkey)
 
-    while True:
-        # Wait for keyboard press in a thread pool
-        # this fuckin sucks
-        # replace with: 'keyboard.add_hotkey("ctrl+f8", on_ctrl_f8_pressed)' (for ex.)
-        await loop.run_in_executor(None, keyboard.wait, "f7")
-        await asyncio.sleep(0.1)  # debounce
+def toggle_recording_hotkey():
+    asyncio.run_coroutine_threadsafe(toggle_recording(), loop)
 
-        if not record_state.recording:
-            # start recording (blocking)
-            await loop.run_in_executor(None, start_recording)
-        else:
-            # stop + transcribe (blocking)
-            text = await loop.run_in_executor(None, stop_recording_and_transcribe)
-            if not text:
-                continue
+async def toggle_recording():
+    global loop
 
-            router.add_to_history("tobi_focuss", text)
+    if not record_state.recording:
+        # start recording (blocking)
+        await asyncio.to_thread(start_recording)
+    else:
+        # stop + transcribe (blocking)
+        text = await asyncio.to_thread(stop_recording_and_transcribe)
+        router.add_to_history("tobi", text)
 
-            ai_reply = await ai.get_ai_reply(tts_state.current_char, f"tobi_focuss: {text}")
-            tts.say_as(tts_state.current_char, ai_reply)
+        ai_reply = await ai.get_ai_reply(tts_state.current_char, f"tobi_focuss: {text}")
+        tts.say_as(tts_state.current_char, ai_reply)
 
 def start_recording():
     if record_state.recording:
         return
 
-    print("🎤 Recording started...")
+    print("Recording started...")
     sound_player.play_sound(sound_player.Sounds.MESSAGE, 0.2, 1.05, 1.1)
     record_state.recording = True
     record_state.audio_buffer = []
@@ -67,7 +67,7 @@ def stop_recording_and_transcribe():
     if not record_state.recording:
         return ""
 
-    print("🛑 Recording stopped.")
+    print("Recording stopped.")
     sound_player.play_sound(sound_player.Sounds.MESSAGE, 0.2, 0.9, 0.95)
     record_state.recording = False
 
@@ -77,7 +77,7 @@ def stop_recording_and_transcribe():
         record_state.stream = None
 
     if not record_state.audio_buffer:
-        print("⚠️ No audio recorded.")
+        print("No audio recorded.")
         return ""
 
     audio = np.concatenate(record_state.audio_buffer, axis=0)
@@ -90,7 +90,7 @@ def stop_recording_and_transcribe():
     )
 
     text = transcript.text.strip()
-    print("🗣️ Transcript:", text)
+    print("Transcript:", text)
     return text
 
 def record_fixed_audio(duration=5):
@@ -98,7 +98,7 @@ def record_fixed_audio(duration=5):
     mic_index = find_hyperx_directsound_mic()
     sd.default.device = (mic_index, None)
 
-    print(f"🎤 Recording {duration}s of idle audio...")
+    print(f"Recording {duration}s of idle audio...")
     audio = sd.rec(int(duration * fs), samplerate=fs, channels=1)
     sd.wait()
 
@@ -111,7 +111,7 @@ def record_fixed_audio(duration=5):
     )
 
     text = transcript.text.strip()
-    print("🗣️ Idle background transcription:", text)
+    print("Idle background transcription:", text)
     return text
 
 

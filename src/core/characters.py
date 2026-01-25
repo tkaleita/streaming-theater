@@ -88,13 +88,31 @@ CATERPILLAR = Character(
     original_y=900
 )
 
+DETECTIVE = Character(
+    name="Detective",
+    voice_id="JJCR1UICgHnHljtvu5uF",
+    img_source="Detective1", 
+    system_prompt=(
+        "you are a detective."
+        "its your job to help your supervising detective (the streamer, tobi)!"
+        "you dont take any crap from people and can be antagonistic."
+        "these character traits can be overriden by a list of character traits that may or may not be included in this message."
+        "if they are included, behave accordingly."
+        "you are the guy in the bottom right of the image."
+    ),
+    original_y=800,
+    subtitle_y_offset=-100
+)
+
+
 # these are accesible to chat using !react command
 CHARACTERS = {
-    "scientist": SCIENTIST,
-    "skeleton": SKELETON,
-    "chat": CHAT,
-    "frog": FROGMAN,
-    "caterpillar": CATERPILLAR
+    "partner": DETECTIVE
+    #"scientist": SCIENTIST,
+    #"skeleton": SKELETON,
+    #"chat": CHAT,
+    #"frog": FROGMAN,
+    #"caterpillar": CATERPILLAR
 }
 
 # this guy is special, only meant for the director module (hence why hes not in the characters list)

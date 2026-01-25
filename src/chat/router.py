@@ -15,7 +15,7 @@ async def handle_message(user, msg, origin = "twitch"):
 
     # normal message
     if not msg.startswith("!"):
-        add_to_history(user, msg)
+        add_to_chat_history(user, msg)
         if DIRECTOR_ENABLE:
             director.handle_message(msg)
         if GAMER_CRED_ENABLE:
@@ -53,7 +53,13 @@ async def handle_message(user, msg, origin = "twitch"):
         chat_state.spam_map[msg_norm].clear()
         await tts.say_as(SAY_CHARACTER, msg)
 
+def add_to_chat_history(user, msg):
+    chat_state.chat_history.append(f"{user}: {msg}")
+    if len(chat_state.chat_history) > CHAT_HISTORY_LIMIT:
+        chat_state.chat_history.pop(0)
+
 def add_to_history(user, msg):
+    print(f"adding '{user}: {msg}' to history!")
     chat_state.history.append(f"{user}: {msg}")
     if len(chat_state.history) > CHAT_HISTORY_LIMIT:
         chat_state.history.pop(0)

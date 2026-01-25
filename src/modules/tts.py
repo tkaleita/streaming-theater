@@ -6,9 +6,10 @@ import soundfile as sf
 from queue import Queue
 import ctypes
 
-from core.state import tts_state
+from core.state import tts_state, chat_state
 from core.config import *
 from core.sound_player import *
+
 
 # background threads
 audio_queue = Queue()

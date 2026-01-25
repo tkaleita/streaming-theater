@@ -36,7 +36,8 @@ def move_source(char: Character, offset_y):
         subtitle_item_id = req.get_scene_item_id(SCENE, char.subtitle_source).scene_item_id
 
         if offset_y <= 1 and tts_state.hold_time <= 0:
-            req.set_scene_item_enabled(SCENE, item_id, False)
+            if REACT_PARTNER_MODE != char:
+                req.set_scene_item_enabled(SCENE, item_id, False)
             req.set_scene_item_enabled(SCENE, subtitle_item_id, False)
         else:
             req.set_scene_item_enabled(SCENE, item_id, True)

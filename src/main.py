@@ -15,14 +15,14 @@ import modules.voice_recog as voice_recog
 async def run_all_listeners():
     tasks = [
         twitch.twitch_listener(),
-        youtube.youtube_listener()
+        #youtube.youtube_listener()
     ]
     
     if SAY_ENABLE or REACT_ENABLE:
         tasks.append(tts.tts_queue_processor())
 
     if REACT_ENABLE:
-        tasks.append(voice_recog.run_vr_loop())
+        await voice_recog.setup_vr()
     
     if IDLE_CHATTER_ENABLE:
         tasks.append(idle.idle_chatter())

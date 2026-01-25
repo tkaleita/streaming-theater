@@ -53,13 +53,13 @@ DIRECTOR_COOLDOWN = 300
 DIRECTOR_CHAT_TIME = 30
 
 # gamer cred
-GAMER_CRED_ENABLE = True
+GAMER_CRED_ENABLE = False
 
 # progress
 PROGRESS_ENABLE = False
 
 # commands
-DEBUG_COOLDOWN = True
+DEBUG_COOLDOWN = True # remove all command cooldown if true
 
 SAY_ENABLE = True
 SAY_COOLDOWN = 90
@@ -67,10 +67,11 @@ SAY_CHARACTER = CHAT
 
 REACT_ENABLE = True
 REACT_COOLDOWN = 60
-DEFAULT_REACT_CHARACTER = SKELETON
+REACT_PARTNER_MODE = DETECTIVE # none for disabled, otherwise choose character
+DEFAULT_REACT_CHARACTER = REACT_PARTNER_MODE if REACT_PARTNER_MODE is not None else SKELETON
 
-JUMPSCARE_ENABLE = True
-JUMPSCARE_COOLDOWN = 90
+JUMPSCARE_ENABLE = False
+JUMPSCARE_COOLDOWN = 120
 
 # elevenlabs
 eleven_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
@@ -82,17 +83,22 @@ SCENE = "Overlay"
 CHAT_HISTORY_LIMIT = 20
 
 # idle chatter
-IDLE_CHATTER_ENABLE = False
+IDLE_CHATTER_ENABLE = True
 #IDLE_CHARACTER = 
-#IDLE_RESET_ON_REACT = False
-MIN_IDLE_TIME = 300
-MAX_IDLE_TIME = 600
-IDLE_RECORD_TIME = 15
+IDLE_RESET_ON_REACT = True
+MIN_IDLE_TIME = 60
+MAX_IDLE_TIME = 120
+IDLE_RECORD_TIME = 0 # keep at 0 for now. recording causes problems
 IDLE_MESSAGES = [
-    "ramble about what you see.",
-    "scream loudly.",
-    "drop unhinged lore.",
-    "comment on current chat conversation.",
-    "talk about your current emotional state."
+    "be helpful!",
+    "make an observation!",
+    "go absolutely crazy",
+    "share something about yourself",
+    "whats going on?"
+    #"ramble about what you see.",
+    #"scream loudly.",
+    #"drop random lore.",
+    #"comment on current chat conversation.",
+    #"talk about your current emotional state."
 ]
 #endregion
