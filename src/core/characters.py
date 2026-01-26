@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 DEFAULT_SUBTITLE_SOURCE = "TTS Subtitle"
 
@@ -8,10 +8,17 @@ class Character:
     voice_id: str
     img_source: str
     system_prompt: str
-    original_y: int
     subtitle_source: str = DEFAULT_SUBTITLE_SOURCE
     subtitle_y_offset: int = 0
     model: str = "gpt-4o-mini"  # default model unless overridden
+
+    def __call__(self, extra_prompt: str, img_source: str, voice_id: str):
+        return replace(
+            self,
+            system_prompt=self.system_prompt + "\n" + extra_prompt,
+            img_source=img_source,
+            voice_id=voice_id if voice_id else self.voice_id
+        )
 
 # ---- ACTUAL CHARACTERS ----
 
@@ -25,7 +32,6 @@ SKELETON = Character(
         "no emojis. no '*'. be chaotic, unpredictable, strange."
         "be strange, confusing, UNHINGED AND CRUDE. say UNIQUE things and make sure to not say the same thing twice."
     ),
-    original_y=1050,
     subtitle_y_offset=150
 )
 
@@ -40,8 +46,7 @@ SCIENTIST = Character(
         "you love to give little factoids about EVERYTHING."
         "sometimes tell stories about your awful colleague 'hans' who seems to fuck everything up and ruins your science"
         " and you kinda wanna kill him."
-    ),
-    original_y=900
+    )
 )
 
 CHAT = Character(
@@ -55,7 +60,6 @@ CHAT = Character(
         "you ONLY say 1-2-word responses like:"
         " 'OMEGALUL', 'WASHED', 'KEKW', 'LUL', 'BALD STREAMER', 'BAD AT GAME', 'CRINGE', 'buh', 'wuh' and many more."
         "YOU DO NOT SAY ANYTHING LONGER THAN THAT EVER."),
-    original_y=850,
     subtitle_y_offset=-25
 )
 
@@ -68,8 +72,7 @@ FROGMAN = Character(
         "you love ponds and water and eating bugs."
         "you dont do much except chill on rocks."
         "actually you are a big fuckin toad. but whatever."
-    ),
-    original_y=900
+    )
 )
 
 CATERPILLAR = Character(
@@ -84,30 +87,43 @@ CATERPILLAR = Character(
         "you prefer a sedentary lifestyle."
         "rarely you tell stories of your long passed caterpillar friends that met their end at a bird/frog/toad."
         "you speak old-timey, kinda like shakespeare, but badly imitated."
-    ),
-    original_y=900
+    )
 )
 
-DETECTIVE = Character(
+#region DETECTIVES
+BASE_DETECTIVE = Character(
     name="Detective",
-    voice_id="JJCR1UICgHnHljtvu5uF",
-    img_source="Detective1", 
+    voice_id="",
+    img_source="", 
     system_prompt=(
         "you are a detective."
-        "its your job to help your supervising detective (the streamer, tobi)!"
+        "its your job to help your supervising detective, tobi, who you recently got assigned to."
+        "solving cases correctly is one of your main motivations."
         "you dont take any crap from people and can be antagonistic."
         "these character traits can be overriden by a list of character traits that may or may not be included in this message."
-        "if they are included, behave accordingly."
+        "if they are included, behave accordingly, but dont make them obvious."
+        "keep it UNPREDICTABLE."
         "you are the guy in the bottom right of the image."
     ),
-    original_y=800,
     subtitle_y_offset=-100
 )
 
+DETECTIVE1_TRAITS = ""
+
+DETECTIVE2_TRAITS = ""
+
+DETECTIVE3_TRAITS = ""
+
+DETECTIVE1 = BASE_DETECTIVE("Character Traits:" + DETECTIVE1_TRAITS, "Detective1", "blcdehRLPwiMTnRJ86Mq")
+DETECTIVE2 = BASE_DETECTIVE("Character Traits:" + DETECTIVE2_TRAITS, "Detective2", "xWQWnWCuz50BnQOq4bAy")
+DETECTIVE3 = BASE_DETECTIVE("Character Traits:" + DETECTIVE3_TRAITS, "Detective3", "SkoYUGGmAjiSIOwyRkUk")
+
+DETECTIVE = DETECTIVE1
+#endregion
 
 # these are accesible to chat using !react command
 CHARACTERS = {
-    "partner": DETECTIVE
+    "detective": DETECTIVE
     #"scientist": SCIENTIST,
     #"skeleton": SKELETON,
     #"chat": CHAT,
@@ -132,6 +148,6 @@ DIRECTOR = Character(
         "take care to make game-appropriate suggestions. the game can be seen in the attached screenshot."
         "this is currently rollercoaster tycoon 3 complete edition."
         "if there isnt a game, go wild, i guess."
-        "you can also make your own suggestions IF FITTING and if building off of the chat history."),
-    original_y=900
+        "you can also make your own suggestions IF FITTING and if building off of the chat history."
+    )
 )

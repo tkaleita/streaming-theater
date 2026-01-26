@@ -102,3 +102,16 @@ IDLE_MESSAGES = [
     #"talk about your current emotional state."
 ]
 #endregion
+
+#region DETECTIVES
+DETECTIVE1_TRAITS = "1. big and fat" \
+                    "2. likes frogs A LOT" \
+                    "3. vehemently defends the streamers hairline" \
+                    "4. shouldve been fired 40 years ago" \
+                    "5. is only 40 years old" \
+                    "6. keeps changing his name to avoid accountability"
+
+DETECTIVE2_TRAITS = ""
+
+DETECTIVE3_TRAITS = ""
+#endregion

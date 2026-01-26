@@ -6,6 +6,9 @@ from core.config import *
 from core.state import tts_state
 from core.characters import Character
 
+is_active = False
+original_y = None
+
 def run_obs_listener():
     with obs.EventClient(
         subs=(obs.Subs.LOW_VOLUME | obs.Subs.INPUTVOLUMEMETERS)
@@ -30,7 +33,7 @@ def calculate_offset(dbL, dbR):
     db = max(min(db, 0), -100)
     return np.interp(db, [-75, 0], [0, MOVEMENT_STRENGTH])
 
-def move_source(char: Character, offset_y):
+def move_source(char: Character, original_y, offset_y):
     try:
         item_id = req.get_scene_item_id(SCENE, char.img_source).scene_item_id
         subtitle_item_id = req.get_scene_item_id(SCENE, char.subtitle_source).scene_item_id
@@ -43,10 +46,11 @@ def move_source(char: Character, offset_y):
             req.set_scene_item_enabled(SCENE, item_id, True)
             req.set_scene_item_enabled(SCENE, subtitle_item_id, True)
 
-        new_y = char.original_y - offset_y
+        pos_x = req.get_scene_item_transform(SCENE,item_id).scene_item_transform["positionX"]
+
+        new_y = original_y - offset_y
         tts_state.hold_time -= 1
 
-        pos_x = req.get_scene_item_transform(SCENE,item_id).scene_item_transform["positionX"]
 
         req.set_scene_item_transform(
             SCENE,
@@ -70,17 +74,38 @@ def move_source(char: Character, offset_y):
         print("ERR moving source:", e)
 
 def on_input_volume_meters(data):
+    global is_active, original_y
+
+    if tts_state.tts_start_flag:
+        print("start")
+        # get position once when we start
+        item_id = req.get_scene_item_id(SCENE, tts_state.current_char.img_source).scene_item_id
+        original_y = req.get_scene_item_transform(SCENE, item_id).scene_item_transform["positionY"]
+        is_active = True
+        tts_state.tts_start_flag = False
+
+    if not is_active:
+        return
+    
     def fget(x):
         return round(20 * log(x, 10), 1) if x > 0 else -200.0
 
     for device in data.inputs:
         if device["inputName"] == DEVICE and device["inputLevelsMul"]:
             left, right = device["inputLevelsMul"]
-            offset = calculate_offset(
+            offset_y = calculate_offset(
                 fget(left[LEVELTYPE.POSTFADER]),
                 fget(right[LEVELTYPE.POSTFADER])
             )
-            move_source(tts_state.current_char, offset)
+            if original_y != None:
+                move_source(tts_state.current_char, original_y, offset_y)
+
+    # doing this back here so the last run can hide the image/subtitle source
+    if tts_state.tts_end_flag:
+        print("end")
+        original_y = None
+        is_active = False
+        tts_state.tts_end_flag = False
 
 def on_input_mute_state_changed(data):
     if data.input_name == DEVICE:

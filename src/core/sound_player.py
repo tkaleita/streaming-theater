@@ -12,6 +12,7 @@ class Sounds(Enum):
     WIN = f"{BASE_DIR}WIN sound effect no copyright.mp3"
     MESSAGE = f"{BASE_DIR}Half-Life 2/message.wav"
     DING = f"{BASE_DIR}Ding Sound Effect HD.mp3"
+    DING2 = f"{BASE_DIR}Half-Life 2/buttonclickrelease.wav"
 
 def play_sound(sound_enum: Sounds, volume: float = 0.5, min_pitch = 0.95, max_pitch = 1.05):
     file_path = sound_enum.value

@@ -37,15 +37,16 @@ async def toggle_recording():
         text = await asyncio.to_thread(stop_recording_and_transcribe)
         router.add_to_history("tobi", text)
 
-        ai_reply = await ai.get_ai_reply(tts_state.current_char, f"tobi_focuss: {text}")
-        tts.say_as(tts_state.current_char, ai_reply)
+        current_char = tts_state.current_char if REACT_PARTNER_MODE is None else REACT_PARTNER_MODE
+        ai_reply = await ai.get_ai_reply(current_char, f"tobi: {text}")
+        tts.say_as(current_char, ai_reply)
 
 def start_recording():
     if record_state.recording:
         return
 
     print("Recording started...")
-    sound_player.play_sound(sound_player.Sounds.MESSAGE, 0.2, 1.05, 1.1)
+    sound_player.play_sound(sound_player.Sounds.DING2, 0.1, 1.05, 1.1)
     record_state.recording = True
     record_state.audio_buffer = []
 
@@ -68,7 +69,7 @@ def stop_recording_and_transcribe():
         return ""
 
     print("Recording stopped.")
-    sound_player.play_sound(sound_player.Sounds.MESSAGE, 0.2, 0.9, 0.95)
+    sound_player.play_sound(sound_player.Sounds.DING2, 0.1, 0.9, 0.95)
     record_state.recording = False
 
     if record_state.stream:

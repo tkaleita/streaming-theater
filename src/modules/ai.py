@@ -14,12 +14,12 @@ async def get_ai_reply(char: Character, msg, take_screenshot = True, chat_histor
     chat_history_str = "".join(f"[{line}]" for line in chat_state.chat_history)
     if (len(chat_history) <= 0):
         chat_history_str = "".join(f"[{line}]" for line in chat_history)
-    print(f"CHAT HISTORY STR: {chat_history_str}")
+    #print(f"CHAT HISTORY STR: {chat_history_str}")
 
     convo_history_str = "".join(f"[{line}]" for line in chat_state.history)
     if (len(chat_state.history) <= 0):
         convo_history_str = "".join(f"[{line}]" for line in chat_state.history)
-    print(f"CONVO HISTORY STR: {convo_history_str}")
+    #print(f"CONVO HISTORY STR: {convo_history_str}")
 
     image_base64 = []
     if (take_screenshot):
@@ -28,29 +28,34 @@ async def get_ai_reply(char: Character, msg, take_screenshot = True, chat_histor
     loop = asyncio.get_event_loop()
     response = await loop.run_in_executor(None, lambda: openai_client.chat.completions.create(
         model=char.model,
-        max_tokens=100,
         messages=[
             {
                 "role": "system",
                 "content": [
                     {"type": "text",
                     "text": 
-                            "MAX 5–35 WORDS. DO NOT END A REPLY WITH A QUESTION."
-                            f"You are {char.name} (just a title), the streamer’s improv partner. Stay in character and react dynamically."
-                            "The streamer's name is 'Tobi' aka 'tobi_focuss'."
-                            "Always “yes, and” the viewer message; add creative details or lore for your character."
-                            f"Dont include your own name at the beginning, i.e. '{char.name}: <message>'. Dont do this."
-                            "NEVER be stingy when it comes to information. Simply make something up."
-                            "Attached below is also a history of the current conversation. Treat it as extra context and do NOT ignore it."
-                            "It allows you to keep track of who said what."
-                            "Attached below everything else is the current Twitch chat. Respond to something if you like."
-                            "Your priority context goes like this: 1. Message, 2. Convo History, 3. Twitch History"
-                            "Subvert expectations and dont simply go for the obvious jokes."
-                            "Do not break the 4th wall unless really funny. Swear if appropriate."
-                            "The stream is for mature audiences."
-                            "React to the screenshot as if live. Use your imagination, be unpredictable."
+                            f"You are playing the character described below."
+                            "During this conversation, you will respond to different queries, questions, and more, fully in-character."
+                            "Included as well is a message directed at you, marked as 'Message: <xyz>'"
+                            "Attached below that is also a history of the current conversation, including (potentially) your own past replies."
+                            "Treat it as extra context and do NOT ignore it, make your reply in-line with the current conversation."
+                            "Attached below everything mentioned before are the current messages from a chatroom. Respond to something if you like and is fitting."
+                            "Your context priority, therefore, goes like this: 1. Message, 2. Convo History, 3. Chat History"
+                            "Here is a description of the character you will be playing:"
                             "- CHARACTER PROMPT START -"
                             f"{char.system_prompt}"
+                            "- CHARACTER PROMPT END -"
+                            "Alongside this, here are some rules you MUST follow during this conversation:"
+                            "1. Your replies MUST be between 1 and 5 sentences."
+                            "2. Always “yes, and” any message directed at you; add creative details or lore for your character."
+                            "3. NEVER be stingy when it comes to information. Simply make something up."
+                            "4. Behave very unhinged and unpredictable. Talk and type in weird and never before seen ways."
+                            "5. Ocassionally include swears like 'fuck', 'shit', 'ass', 'motherfucker', etc, in your reply."
+                            "6. React to the screenshot as if live."
+                            "7. NEVER end your reply on a question."
+                            "8. Talk naturally, exactly like how your character would. Behave as 'human' as possible."
+                            "9. Exaggerate every characteristic youve been given, but also come up with new ones. Basically: dont become stale."
+                            "10. You do not need to include EVERY characteristic in each message. Only 'use' the currently relevant ones."
 
                     }
                 ],
@@ -59,9 +64,9 @@ async def get_ai_reply(char: Character, msg, take_screenshot = True, chat_histor
                 "role": "user",
                 "content": [
                     {"type": "text",
-                     "text":    f"Message (directed at you): '{msg}' | "
+                     "text":    f"Message: '{msg}' | "
                                 f"Convo History: {convo_history_str} | "
-                                f"Twitch Chat History: {chat_history_str} | "
+                                f"Chat History: {chat_history_str} | "
                     },
                     {
                         "type": "image_url",

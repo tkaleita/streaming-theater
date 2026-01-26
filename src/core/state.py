@@ -11,6 +11,8 @@ class TtsState:
     busy: bool = False
     current_char: Character = field(default_factory=lambda: DEFAULT_REACT_CHARACTER)
     hold_time: float = 0.0
+    tts_start_flag: bool = False
+    tts_end_flag: bool = False
 
 @dataclass
 class ChatState:

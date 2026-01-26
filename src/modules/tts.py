@@ -40,6 +40,7 @@ async def tts_queue_processor():
         char, text = await tts_state.queue.get()
         print(f"[QUEUE] popped: {char.name}: {text!r}")
         tts_state.busy = True
+        tts_state.tts_start_flag = True # to get consumed by obs_move
 
         await fire_tts(char, text)
 
@@ -51,6 +52,7 @@ async def tts_queue_processor():
             await asyncio.sleep(0.05)
 
         tts_state.busy = False
+        tts_state.tts_end_flag = True
 
 def eleven_generate(char: Character, text):
     # Request TTS generation
@@ -96,14 +98,69 @@ def say_as(char: Character, text):
 
 async def fire_tts(char: Character, text):
     tts_state.current_char = char
-    print(tts_state.current_char.name)
 
     audio_file = eleven_generate(char, text)
-    
-    # update OBS subtitle and current source
+    audio_queue.put(audio_file)
+
+    # Split text into chunks
+    chunks = list(chunk_text(text, max_words=5))
+    num_chunks = len(chunks)
+
+    # Get audio duration
+    total_duration = get_audio_duration(audio_file)
+    per_chunk_duration = total_duration / num_chunks
+
+    for chunk in chunks:
+        asyncio.create_task(update_subtitles(char.subtitle_source, chunk))
+        await asyncio.sleep(per_chunk_duration)
+
+    # Clear subtitle at end
     req.set_input_settings(
         name=char.subtitle_source,
+        settings={"text": ""},
+        overlay=True
+    )
+
+async def update_subtitles(source, text):
+    # update subs
+    req.set_input_settings(
+        name=source,
         settings={"text": text},
         overlay=True
     )
-    audio_queue.put(audio_file)
+    # trigger animation
+    asyncio.create_task(animate_subtitle(source))
+
+async def animate_subtitle(source):
+    item_id = req.get_scene_item_id(SCENE, source).scene_item_id
+
+    # Crash zoom
+    start_scale = 1.25
+    duration = 0.25
+    steps = 20
+    for i in range(steps + 1):
+        t = i / steps
+        eased_t = 1 - (1 - t) ** 2  # ease-out
+        current_scale = start_scale + (1.0 - start_scale) * eased_t
+        
+        req.set_scene_item_transform(
+            scene_name=SCENE,
+            item_id=item_id,
+            transform={
+                "scaleX": current_scale,
+                "scaleY": current_scale
+            }
+        )
+
+        await asyncio.sleep(duration / steps)
+
+def get_audio_duration(path: str) -> float:
+    data, samplerate = sf.read(path)
+    frames = len(data)
+    duration_seconds = frames / samplerate
+    return duration_seconds
+
+def chunk_text(text, max_words=10):
+    words = text.split()
+    for i in range(0, len(words), max_words):
+        yield " ".join(words[i:i + max_words])
