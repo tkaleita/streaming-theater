@@ -9,10 +9,11 @@ from core.config import *
 class TtsState:
     queue: asyncio.Queue[tuple[Character, str]] = field(default_factory=asyncio.Queue)
     busy: bool = False
-    current_char: Character = field(default_factory=lambda: DEFAULT_REACT_CHARACTER)
+    current_char: Character = field(default_factory=lambda: ASK_DEFAULT_CHAR)
     hold_time: float = 0.0
     tts_start_flag: bool = False
     tts_end_flag: bool = False
+    sliding: bool = False
 
 @dataclass
 class ChatState:

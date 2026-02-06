@@ -10,7 +10,6 @@ from core.state import tts_state, chat_state
 from core.config import *
 from core.sound_player import *
 
-
 # background threads
 audio_queue = Queue()
 def audio_worker():
@@ -21,7 +20,6 @@ def audio_worker():
         path = audio_queue.get()
         print(path)
         try:
-            play_sound(Sounds.MESSAGE, 0.25)
             play_file_to_virtual_cable(path)
         except Exception as e:
             print("Audio error:", e)
@@ -29,12 +27,9 @@ def audio_worker():
 
 async def tts_queue_processor():
     while True:
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(0.1)
 
-        if tts_state.queue.empty():
-            continue
-
-        if tts_state.busy:
+        if tts_state.queue.empty() or tts_state.busy or tts_state.sliding:
             continue
 
         char, text = await tts_state.queue.get()
@@ -103,7 +98,7 @@ async def fire_tts(char: Character, text):
     audio_queue.put(audio_file)
 
     # Split text into chunks
-    chunks = list(chunk_text(text, max_words=5))
+    chunks = list(chunk_text(text, max_words=7))
     num_chunks = len(chunks)
 
     # Get audio duration
@@ -113,13 +108,6 @@ async def fire_tts(char: Character, text):
     for chunk in chunks:
         asyncio.create_task(update_subtitles(char.subtitle_source, chunk))
         await asyncio.sleep(per_chunk_duration)
-
-    # Clear subtitle at end
-    req.set_input_settings(
-        name=char.subtitle_source,
-        settings={"text": ""},
-        overlay=True
-    )
 
 async def update_subtitles(source, text):
     # update subs

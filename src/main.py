@@ -18,10 +18,10 @@ async def run_all_listeners():
         #youtube.youtube_listener()
     ]
     
-    if SAY_ENABLE or REACT_ENABLE:
+    if SAY_ENABLE or ASK_ENABLE:
         tasks.append(tts.tts_queue_processor())
 
-    if REACT_ENABLE:
+    if ASK_ENABLE:
         await voice_recog.setup_vr()
     
     if IDLE_CHATTER_ENABLE:

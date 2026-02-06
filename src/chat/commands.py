@@ -58,8 +58,6 @@ async def call_command(origin: str, cmd: Command, user: str, raw_args: str):
             await shared.send_message(origin, f"@{user} -> {cmd.name} cooldown {remaining}s!")
             return
 
-        chat_state.last_used[user][cmd.name] = now
-
     parts = raw_args.split()
     parsed: dict[str, str | None] = {}
     arg_specs = cmd.args
@@ -107,7 +105,12 @@ async def call_command(origin: str, cmd: Command, user: str, raw_args: str):
     queue_size = tts_state.queue.qsize() + 1 + tts_state.busy
     pos_msg = "" if queue_size == 1 else f" (queue pos {queue_size})"
     await shared.send_message(origin, f"@{user} -> invokes {cmd.name}!{pos_msg}")
-    return await cmd.func(origin=origin, user=user, **parsed)
+    success = await cmd.func(origin=origin, user=user, **parsed)
+    if success and not DEBUG_COOLDOWN:
+        # only add cooldown if command was succesful and debug cooldown is disabled
+        now = time.time()
+        chat_state.last_used[user][cmd.name] = now
+
 #endregion
 
 #region COMMANDS
@@ -122,22 +125,24 @@ async def say(origin, user, text):
     router.add_to_history(char.name, text)
     print(f"!say from {user}: {text}")
     tts.say_as(char, text)
+    return True
 
 @command(
-    name="react",
+    name="ask",
     args=["character", "text?"],
-    cooldown=REACT_COOLDOWN,
-    enabled=REACT_ENABLE
+    cooldown=ASK_COOLDOWN,
+    enabled=ASK_ENABLE
 )
-async def react(origin, user, character, text):
+async def ask(origin, user, character, text):
     key = character.lower()
     char = CHARACTERS.get(key)
     if char is None:
         available = ", ".join(CHARACTERS.keys())
         await shared.send_message(origin, f"@{user} -> unknown character '{character}'. available: {available}")
-        return
+        return False
     ai_reply = await ai.get_ai_reply(char, f"from {user}: {text}")
     tts.say_as(char, ai_reply)
+    return True
 
 @command(
     name="jumpscare",
@@ -147,5 +152,5 @@ async def react(origin, user, character, text):
 )
 async def jumpscare(origin, user):
     js.play_jumpscare()
-    return
+    return True
 #endregion

@@ -37,7 +37,21 @@ async def twitch_listener():
                 continue
             
             await router.handle_message(user, msg)
-        
+    
+def refresh_token():
+    global TW_TOKEN, TW_REFRESH
+    url = "https://id.twitch.tv/oauth2/token"
+    data = {
+        "grant_type": "refresh_token",
+        "refresh_token": TW_REFRESH,
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET
+    }
+    r = requests.post(url, data=data).json()
+    TW_TOKEN = r['access_token']
+    TW_REFRESH = r['refresh_token'] # Refresh tokens can change too!
+    print("Token refreshed successfully!")
+
 def send_message(message):
     url = "https://api.twitch.tv/helix/chat/messages"
     headers = {

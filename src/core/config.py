@@ -59,16 +59,15 @@ GAMER_CRED_ENABLE = False
 PROGRESS_ENABLE = False
 
 # commands
-DEBUG_COOLDOWN = True # remove all command cooldown if true
+DEBUG_COOLDOWN = True  # remove all command cooldown if true
 
 SAY_ENABLE = True
 SAY_COOLDOWN = 90
-SAY_CHARACTER = CHAT
+SAY_CHARACTER = CHEF
 
-REACT_ENABLE = True
-REACT_COOLDOWN = 60
-REACT_PARTNER_MODE = DETECTIVE # none for disabled, otherwise choose character
-DEFAULT_REACT_CHARACTER = REACT_PARTNER_MODE if REACT_PARTNER_MODE is not None else SKELETON
+ASK_ENABLE = True
+ASK_COOLDOWN = 60
+ASK_DEFAULT_CHAR = ANGRY_CHEF
 
 JUMPSCARE_ENABLE = False
 JUMPSCARE_COOLDOWN = 120
@@ -85,33 +84,20 @@ CHAT_HISTORY_LIMIT = 20
 # idle chatter
 IDLE_CHATTER_ENABLE = True
 #IDLE_CHARACTER = 
-IDLE_RESET_ON_REACT = True
-MIN_IDLE_TIME = 60
-MAX_IDLE_TIME = 120
+IDLE_RESET_ON_REACT = False
+MIN_IDLE_TIME = 300
+MAX_IDLE_TIME = 1200
 IDLE_RECORD_TIME = 0 # keep at 0 for now. recording causes problems
 IDLE_MESSAGES = [
-    "be helpful!",
-    "make an observation!",
-    "go absolutely crazy",
-    "share something about yourself",
-    "whats going on?"
+    "(this is automatic idle chatter) be helpful!",
+    "(this is automatic idle chatter) make an observation!",
+    "(this is automatic idle chatter) go absolutely crazy",
+    "(this is automatic idle chatter) share something about yourself",
+    "(this is automatic idle chatter) whats going on?"
     #"ramble about what you see.",
     #"scream loudly.",
     #"drop random lore.",
     #"comment on current chat conversation.",
     #"talk about your current emotional state."
 ]
-#endregion
-
-#region DETECTIVES
-DETECTIVE1_TRAITS = "1. big and fat" \
-                    "2. likes frogs A LOT" \
-                    "3. vehemently defends the streamers hairline" \
-                    "4. shouldve been fired 40 years ago" \
-                    "5. is only 40 years old" \
-                    "6. keeps changing his name to avoid accountability"
-
-DETECTIVE2_TRAITS = ""
-
-DETECTIVE3_TRAITS = ""
 #endregion

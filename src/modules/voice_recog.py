@@ -21,7 +21,7 @@ loop = None
 async def setup_vr():
     global loop
     loop = asyncio.get_running_loop()
-    keyboard.add_hotkey("f7", toggle_recording_hotkey)
+    keyboard.add_hotkey("ctrl+f7", toggle_recording_hotkey)
 
 def toggle_recording_hotkey():
     asyncio.run_coroutine_threadsafe(toggle_recording(), loop)
@@ -37,7 +37,7 @@ async def toggle_recording():
         text = await asyncio.to_thread(stop_recording_and_transcribe)
         router.add_to_history("tobi", text)
 
-        current_char = tts_state.current_char if REACT_PARTNER_MODE is None else REACT_PARTNER_MODE
+        current_char = tts_state.current_char
         ai_reply = await ai.get_ai_reply(current_char, f"tobi: {text}")
         tts.say_as(current_char, ai_reply)
 
