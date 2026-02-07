@@ -37,7 +37,8 @@ async def toggle_recording():
         text = await asyncio.to_thread(stop_recording_and_transcribe)
         router.add_to_history("tobi", text)
 
-        current_char = tts_state.current_char
+        current_char = ASK_DEFAULT_CHAR if ASK_VR_OVERRIDE else tts_state.current_char
+
         ai_reply = await ai.get_ai_reply(current_char, f"tobi: {text}")
         tts.say_as(current_char, ai_reply)
 

@@ -67,6 +67,7 @@ SAY_CHARACTER = CHEF
 
 ASK_ENABLE = True
 ASK_COOLDOWN = 60
+ASK_VR_OVERRIDE = True # for voice recognition. always replies with default char if True
 ASK_DEFAULT_CHAR = ANGRY_CHEF
 
 JUMPSCARE_ENABLE = False
